@@ -1,0 +1,200 @@
+/* Empty. Add your own CSS if you like */
+@font-face {
+    font-family: 'Raleway-Regular';
+    src:url('fonts/Raleway/Raleway-Regular.ttf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Raleway-Bold';
+    src:url('fonts/Raleway/Raleway-Bold.ttf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Raleway-Light';
+    src:url('fonts/Raleway/Raleway-Light.ttf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+html, body {
+    font-family: 'Raleway-Regular', sans-serif;
+    font-size: 18px;
+    color: #000;
+    line-height: 1.2;
+}
+
+h1, h2, h3, h4, h5, h6, .tab-item, button, .button-small, .title, .ion-nav-title, .bar.bar-light .title  {
+    font-family: 'Raleway-Bold', sans-serif;
+}
+
+.bar.bar-light .title, .item, .item p  {
+    color:#000;
+}
+
+.item p  {
+    
+}
+
+input, textarea, input[type="text"], 
+input[type="password"], input[type="datetime"], 
+input[type="datetime-local"], input[type="date"], 
+input[type="month"], input[type="time"], input[type="week"], 
+input[type="number"], input[type="email"], input[type="url"], 
+input[type="search"], input[type="tel"], input[type="color"] {
+    font-family: 'Raleway-Bold';
+}
+
+._tbl{
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+._cll{
+    display: table-cell;
+    vertical-align: middle;
+}
+
+
+#buddy_head{
+    width:100%;
+    text-align:center
+}
+#buddy_head img#buddy_head_logo{
+    width: auto;
+    height: auto;
+    max-width:50%;
+    max-height: 100%;
+}
+#buddy_header .bar.bar-header{
+    background-color: #120A3E;
+}
+#buddy_header img#buddy_head_logo{
+    max-width: 29%;
+    padding: 5px;
+}
+#buddy_header .bar-stable .button,
+#buddy_header .bar-stable .button:hover{
+    color: #FFFFFF;
+}
+.error-message{
+    font-family: 'Raleway-Light', sans-serif;
+    width: 100%;
+    text-align: center;
+    color:#000;
+}
+.error-message.error-login {
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    color:#FFF;
+}
+.txt-center{
+    text-align: center;
+}
+
+
+/*
+ * MAIN MENU
+ */
+.mainmenu .avatar{
+    max-height:50px;
+    max-width:50px;
+    width:100%;
+    margin-right:15px;
+    float:left;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+}
+
+
+
+/*
+ * MAIN LOGIN PAGE
+ */
+#page_buddy_login_main {
+    background-color: #120A3E;
+}
+#page_buddy_login_main  #buddy_head{
+    margin-top: 40%;
+}
+#page_buddy_login_main .col {
+    color: #FFF;
+    text-align: center;
+}
+#page_buddy_login_main h5 {
+    color: #FFF;
+    text-align: center;
+}
+#page_buddy_login_main #buddy_main_login_password,
+#buddy_main_login_form button {
+    text-align: center;
+    width:100%;
+}
+
+
+
+/*
+ * HOME PAGE
+ */
+.block_grid {
+    position: relative;
+    width: 100%;
+}
+.block_grid ._block ._block_img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.block_grid ._block{
+    position: relative;
+    float: left;
+    width: 100%;
+}
+
+.block_grid ._block .block_title {
+    color: #FFF;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #120A3E;
+    text-align:center;
+    /* height:150px; */
+}
+.block_grid ._block .block_title ._cll{
+    padding: 0 5%;
+}
+.block_grid ._block .block_goto{
+    position: absolute;
+    background: #FFF;
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    color: #000;
+    top: -35px;
+    right: 10px;
+    text-align: center;
+    line-height: 31px;
+    display:none;
+}
+
+.block_grid ._block.block_w_50{
+    width: 50%;
+    outline: 2px solid #FFF;
+}
+.block_grid ._block.block_w_50 .block_goto{
+    display:block;
+}
+.block_grid ._block.block_w_50 .block_title {
+    height:75px;
+    font-size:15px;
+    text-align:left;
+}
+.block_grid ._block.block_w_100 .block_title{
+    background-color: rgba(18, 10, 62, 0.15);
+}

@@ -1,0 +1,36 @@
+<ion-view ng-controller="HomeController">
+    
+    <ion-content id="page_buddy_login_main" has-header="true" padding="true">
+        
+        <div id="buddy_head">
+            <img id="buddy_head_logo" src="img/logo_white.png" alt="BuddyBank" />
+        </div>
+        
+        
+        <div class="row">
+            <div class="col"><h5>Enter PIN</h5></div>
+        </div>
+        
+        <div class="row">
+            <div class="col">
+                <form id="buddy_main_login_form">
+
+                    <div class="list">
+                        <label class="item item-input">
+                            <input id="buddy_main_login_password" maxlength="8" type="password">
+                        </label>
+                    </div>
+                    <div class="list">
+                        <button class="button button-light" ng-click="login();">LOGIN</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+        
+        <div class="error-message error-login" ng-if="loginFail">Login failed, check your pin.</div>
+        
+        
+    </ion-content>
+
+</ion-view>

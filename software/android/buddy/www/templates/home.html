@@ -1,0 +1,29 @@
+<ion-view ng-controller="HomeController" ng-init="init()">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content id="page_buddy_home" has-header="true" padding="false">
+        <div ng-if="pageCompleted===''" ng-include src="'templates/loading_generic.html'"></div>
+        <div ng-if="pageCompleted==='ko'" ng-include src="'templates/error_generic.html'"></div>
+        <div ng-if="pageCompleted==='ok'">
+            
+            <div class="block_grid">
+                
+                <div class="_block block_w_{{item.width}}" ng-repeat="item in items">
+                    
+                    <img class="_block_img" ng-src="{{item.image}}" imgloader />
+                    
+                    <div class="block_title">
+                        <div class="block_goto"><i class="icon ion-chevron-right"></i></div>
+                        <div class="_tbl"><div class="_cll">{{item.title}}</div></div>
+                    </div>
+                    
+                </div>
+                    
+            </div>
+            
+        </div>
+        
+    </ion-content>
+
+</ion-view>

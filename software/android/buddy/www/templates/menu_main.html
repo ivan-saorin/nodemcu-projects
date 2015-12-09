@@ -1,0 +1,42 @@
+<ion-side-menus>
+
+    <ion-pane ion-side-menu-content>
+        
+        <ion-nav-bar id="buddy_header" class="bar-stable">
+            
+            <ion-nav-buttons side="right">
+                <div id="buddy_head">
+                    <img id="buddy_head_logo" src="img/logo_white.png" alt="BuddyBank" />
+                </div>
+            </ion-nav-buttons>
+            
+        </ion-nav-bar>
+        
+        <ion-nav-view name="menuContent" animation="slide-left-right"></ion-nav-view>
+                
+    </ion-pane>
+
+    <ion-side-menu side="left" ng-controller="NavController">
+        
+        <header class="bar bar-header bar-stable">
+            <h1 class="title">BuddyBank</h1>
+        </header>
+        
+        <ion-content class="has-header">
+            
+            <ion-list>
+                <ion-item ng-if="avatar!==''" nav-clear menu-close ng-click="toggleLeft()">
+                    <img ng-src="{{avatar}}" class="avatar"/>
+                </ion-item>
+                <ion-item ng-if="userName!==null && userName!==''" nav-clear menu-close ng-click="toggleLeft()">
+                    <i class="icon ion-person"></i> {{userName}} {{userLastName}}
+                </ion-item>
+                <ion-item nav-clear menu-close ng-click="Nav_logOut()">
+                <i class="icon ion-log-out"></i> Log Out
+                </ion-item>
+            </ion-list>
+            
+        </ion-content>
+    </ion-side-menu>
+    
+</ion-side-menus>
