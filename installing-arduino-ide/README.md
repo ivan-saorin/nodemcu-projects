@@ -24,3 +24,6 @@
 * Click ```Install```
 
 * Select your NodeMCU board in ```Tools > Board: xxx > <boards>```
+
+To allow usb usage within Arduino IDE:
+```sudo chmod 666 /dev/ttyUSB0```
