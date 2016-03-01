@@ -33,13 +33,56 @@ const char* server_version = "1.0.0";
 const char* ssid = "IvanWireless";
 const char* password = "unbreakable";
 
+const char* iotfId = "iotfId:test";
+
+int status = WL_IDLE_STATUS;
+
+unsigned int localPort = 2390;      // local port to listen for UDP packets
+
+byte packetBuffer[512]; //buffer to hold incoming and outgoing packets
+
+// A UDP instance to let us send and receive packets over UDP
+WiFiUDP Udp;
+
 //Color Capture flags
 
 char capturedColorRGB[12];
 
+char myIp[16];
+
 MDNSResponder mdns;
 
-Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+/*
+INTEGRATIONTIME_2MS=0xFF   --<  2.4ms - 1 cycle    - Max Count: 1024  
+INTEGRATIONTIME_24MS=0xF6   --<  24ms  - 10 cycles  - Max Count: 10240 
+INTEGRATIONTIME_50MS=0xEB   --<  50ms  - 20 cycles  - Max Count: 20480 
+INTEGRATIONTIME_101MS=0xD5   --<  101ms - 42 cycles  - Max Count: 43008 
+INTEGRATIONTIME_154MS=0xC0   --<  154ms - 64 cycles  - Max Count: 65535 
+INTEGRATIONTIME_700MS=0x00   --<  700ms - 256 cycles - Max Count: 65535 
+
+GAIN_1X=0x00   --<  No gain  
+GAIN_4X=0x01   --<  2x gain  
+GAIN_16X=0x02   --<  16x gain 
+GAIN_60X=0x03   --<  60x gain 
+*/
+
+const int TIME_2MS=3;
+const int TIME_24MS=30;
+const int TIME_50MS=55;
+const int TIME_101MS=110;
+const int TIME_154MS=160;
+const int TIME_700MS=710;
+
+const int MV_2MS=1024;
+const int MV_24MS=10240;
+const int MV_50MS=20480;
+const int MV_101MS=4308;
+const int MV_154MS=65535;
+const int MV_700MS=65535;
+
+Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_154MS, TCS34725_GAIN_4X);
+int mt = TIME_154MS;
+int mv = MV_154MS;
 
 ESP8266WebServer server(80);
 
@@ -118,37 +161,57 @@ String jsonLineString(String field, String value) {
 sensor_data_type captureColor()
 {  
   digitalWrite(sensor_led, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(50);  
   sensor_data_type sensor_data;
-
-  memset(capturedColorRGB,0,12);
+  memset(capturedColorRGB,0,16);
  
-  delay(60);  // takes 50ms to read 
+  delay(mt);  // takes 50ms to read 
   
   colorSensor.getRawData(&sensor_data.red, &sensor_data.green, &sensor_data.blue, &sensor_data.clear);
 
   sensor_data.color_temperature = colorSensor.calculateColorTemperature(sensor_data.red, sensor_data.green, sensor_data.blue);
   sensor_data.lux= colorSensor.calculateLux(sensor_data.red, sensor_data.green, sensor_data.blue);
-  
+
+  sprintf(capturedColorRGB,"%d,%d,%d-%d", (int)sensor_data.red, (int)sensor_data.green, (int)sensor_data.blue, (int)sensor_data.clear) ;
+  Serial.print("RAW capturedColorRGB: ");
+  Serial.println(capturedColorRGB);
+
   colorSensor.setInterrupt(true);  // turn off LED
   
   // Figure out some basic hex code for visualization
   uint32_t sum = sensor_data.red + sensor_data.green + sensor_data.blue;
+
+  float r, g, b, c;
+  r = sensor_data.red ;
+  g = sensor_data.green;
+  b = sensor_data.blue;
+  c = sensor_data.clear;
+
+  
+  r *= 255; r /= c;
+  g *= 255; g /= c; 
+  b *= 255; b /= c; 
+
+  //hexColor = hex(color(wRed, wGreen, wBlue), 6);
+
+  g *= 2;
+  b *= 3;
  
-  float r, g, b;
-  r = sensor_data.red; r /= sum;
-  g = sensor_data.green; g /= sum;
-  b = sensor_data.blue; b /= sum;
-  r *= 256; g *= 256; b *= 256;
-   if (r > 255) r = 255;
+  if (r > 255) r = 255;
   if (g > 255) g = 255;
   if (b > 255) b = 255;
+
   
-  sprintf(capturedColorRGB,"%d,%d,%d", (int)r ,(int)g ,(int)b) ;
+  
+
+  sensor_data.red = r;
+  sensor_data.green = g;
+  sensor_data.blue = b;
+  
+  memset(capturedColorRGB,0,16);
+  sprintf(capturedColorRGB,"%d,%d,%d", (int)r ,(int)g ,(int)b);
   Serial.print("capturedColorRGB: ");
   Serial.println(capturedColorRGB);
 
-  delay(50);  
   digitalWrite(sensor_led, LOW);   // turn the LED on (HIGH is the voltage level)
   return sensor_data;
 }
@@ -178,20 +241,69 @@ void jsonSensorsHandler() {
 
 void htmlSensorHandler() {
   digitalWrite(led, LOW);
-  String message =  "<html><head><title>RGB Sensor</title><script src=\"//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js\"></script><script>";
+  String message =  "<html><head><title>RGB Sensor</title><script src=\"//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js\"></script>";
+  message += "<script>";
+  message += "function rgb2hex(rgb) {";
+  message += "var rgb = Array.apply(null, arguments).join().match(/\\d+/g);";
+  message += "rgb = ((rgb[0] << 16) + (rgb[1] << 8) + (+rgb[2])).toString(16);";
+  // for (var i = rgb.length; i++ < 6;) rgb = '0' + rgb;
+  message += "return rgb;";
+  message += "};"  ;
   message += "function updateColor() {";
   message += "$.getJSON(\"http://192.168.1.162/sensor.json\", function( resp ) {";
   message += "$(\"body\").css(\"background-color\", \"rgb(\" + resp.red + \", \" + resp.green + \", \" + resp.blue + \")\");";
+  message += "var color_name = \"#\" + rgb2hex(resp.red, resp.green, resp. blue);";  
+  message += "$(\".color_name\").html(color_name);";  
+  message += "$(\".color_value\").html(\"(\" + resp.red + \", \" + resp.green + \", \" + resp.blue + \")\");";  
   message += "setTimeout(updateColor, 3000);";  
   message += "});";
   message += "};";
+  message += "function RelayClient(config, handler) {";
+  message += "var connected = false;";
+  message += "var connectHandler = handler;";
+  message += "var socket = new WebSocket(config.relayURL);";
+  message += "socket.onopen = function() {";
+  message += "socket.send('open ' + config.remoteHost + ' ' + config.remotePort);";
+  message += "};";
+  message += "socket.onmessage = function(event) {";
+  message += "if (!connected && event.data == 'connected') {";
+  message += "connected = true;";
+  message += "handler(socket);";
+  message += "}}}"; 
   message += "$(function() {";
   message += "updateColor();";
   message += "});";
-  message += "</script></head><body></body></html>";
+  message += "</script>";
+  message += "<style>";
+  message += "</style>";
+  message += "</head><body><h1 class=\"color_name\"></h1><h1 class=\"color_value\"></h1></body></html>";
 
   serverSend(200, "text/html", message);
   digitalWrite(led, HIGH);
+}
+
+void printWifiStatus() {
+// print the SSID of the network you're attached to:
+
+  Serial.print("Connected to SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your WiFi shield's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
+  byte oct1 = ip[0];
+  byte oct2 = ip[1];
+  byte oct3 = ip[2];
+  byte oct4 = ip[3];
+  sprintf(myIp, "%d.%d.%d.%d", oct1, oct2, oct3, oct4);  
+
+  // print the received signal strength:
+  long rssi = WiFi.RSSI();
+  Serial.print("signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
 }
 
 void setup() {
@@ -199,7 +311,7 @@ void setup() {
   Serial.begin(115200);
 
   //Serial.begin(9600);
-  Serial.println("DHTxx test!");
+  Serial.println("iot server starting...");
 
 
   Wire.begin(SDA_PIN, SCL_PIN);
@@ -227,6 +339,12 @@ void setup() {
     Serial.println("MDNS responder started");
   }
 
+  printWifiStatus();
+
+  Serial.println("Connected to wifi");
+  Serial.print("Udp server started at port ");
+  Serial.println(localPort);
+  Udp.begin(localPort);
   colorSensor.begin();
   sensor_data_type sensor_data = captureColor();  //do it to turn off the LED and as a sanity check
   
@@ -246,6 +364,69 @@ void setup() {
   blinkLed(10, 50, 100);
 }
 
+String byteArrayToString(byte* byteArray, int noBytes) {
+  char bfr[noBytes];
+  strncpy(bfr, (char *)byteArray, noBytes);
+  String myString = String(bfr);  
+  
+  return myString.substring(0,noBytes);
+}
+
+void stringToByteArray(String msg, char* buffer) {
+  if (msg.length() > 255) {
+    msg = msg.substring(0, 255);
+    Serial.println("WARN msg was truncated to length 255");
+  }
+  msg.toCharArray(buffer, 255);
+}
+
 void loop() {
+  String req = "";
+  int noBytes = Udp.parsePacket();
+  if ( noBytes ) {
+    Serial.print(millis() / 1000);
+    Serial.print(":Packet of ");
+    Serial.print(noBytes);
+    Serial.print(" received from ");
+    Serial.print(Udp.remoteIP());
+    Serial.print(":");
+    Serial.println(Udp.remotePort());
+    // We've received a packet, read the data from it
+    Udp.read(packetBuffer,noBytes); // read the packet into the buffer
+
+    // display the packet contents in HEX
+    for (int i=1;i<=noBytes;i++){
+      Serial.print(packetBuffer[i-1],HEX);
+      if (i % 32 == 0){
+        Serial.println();
+      }
+      else Serial.print(' ');
+    } // end for
+    Serial.println();
+    req += byteArrayToString(packetBuffer, noBytes);
+    Serial.println(req);
+
+      // send a reply, to the IP address and port that sent us the packet we received
+    Serial.println("1");
+    //String ip = new String(myIp);
+    String response = "http://" + (String) myIp + "/";
+    byte message[response.length()];
+    for (int i = 0; i < response.length(); i++) {
+      message[i] = response.charAt(i);
+    }
+    message[response.length()] = 0;
+    
+    //memset(replyBuffer,0,response.length()+1);
+    //response.toCharArray(replyBuffer, response.length()-1);
+    Serial.println("2");
+    Serial.println("3");
+    Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+    Serial.println("4");
+    Udp.write(message, sizeof(message));
+    Serial.println("5");
+    Udp.endPacket(); 
+    Serial.println("6"); 
+  } // end if  
+
   server.handleClient();
 }
