@@ -1,0 +1,13 @@
+{
+  "name": "logger",
+  "keywords": "ESP8266, Arduino, Pin-Out",
+  "description": "Arduino to esp8266 logger conversion constants",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/ivan.saorin/logger.git"
+  },
+  "frameworks": "arduino",
+  "platforms": "espressif",
+  "version": "0.1.2"
+}

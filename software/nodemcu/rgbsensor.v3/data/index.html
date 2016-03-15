@@ -1,0 +1,44 @@
+<html>
+<head>
+  <title>RGB Sensor</title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+  <script>
+  function rgb2hex(r,g,b) {
+    //var rgb = Array.apply(null, arguments).join().match(/\\d+/g);
+    var rgb = ((r << 16) + (g << 8) + b).toString(16);
+    // for (var i = rgb.length; i++ < 6;) rgb = '0' + rgb;
+    return rgb;
+  };
+  function updateColor() {
+    $.getJSON("/sensor.json", function( resp ) {
+      $("body").css("background-color", "rgb(" + resp.red + ", " + resp.green + ", " + resp.blue + ")");
+      var color_name = "#" + rgb2hex(resp.red, resp.green, resp.blue);
+      $(".color_name").html(color_name);
+      $(".color_value").html("(" + resp.red + ", " + resp.green + ", " + resp.blue + ")");
+      setTimeout(updateColor, 3000);
+    });
+  };
+  function RelayClient(config, handler) {
+    var connected = false;
+    var connectHandler = handler;
+    var socket = new WebSocket(config.relayURL);
+    socket.onopen = function() {
+      socket.send('open ' + config.remoteHost + ' ' + config.remotePort);
+    };
+    socket.onmessage = function(event) {
+      if (!connected && event.data == 'connected') {
+        connected = true;
+        handler(socket);
+      }}}
+      $(function() {
+        updateColor();
+      });
+      </script>
+      <style>
+      </style>
+    </head>
+    <body>
+      <h1 class="color_name"></h1>
+      <h1 class="color_value"></h1>
+    </body>
+  </html>

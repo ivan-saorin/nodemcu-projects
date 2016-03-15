@@ -1,0 +1,13 @@
+{
+  "name": "Zeroconf",
+  "keywords": "ESP8266, Arduino, Pin-Out",
+  "description": "Arduino to esp8266 Zeroconf conversion constants",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/ivan.saorin/Zeroconf.git"
+  },
+  "frameworks": "arduino",
+  "platforms": "espressif",
+  "version": "0.1"
+}
