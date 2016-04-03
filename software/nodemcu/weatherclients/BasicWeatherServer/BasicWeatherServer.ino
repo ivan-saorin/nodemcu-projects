@@ -1,3 +1,4 @@
+#include "Logger.h"
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -37,6 +38,8 @@ Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(12345);
 //#define DHTTYPE DHT11   // DHT 11
 #define DHTTYPE DHT22     // DHT 22  (AM2302), AM2321
 //#define DHTTYPE DHT21   // DHT 21 (AM2301)
+
+Logger logger("*WeatherStation:");
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -176,10 +179,6 @@ void jsonSensorsHandler() {
   digitalWrite(led, HIGH);
 }
 
-void error404handler() {
-  textError404handler();
-}
-
 void textError404handler(){
   String message = "File Not Found\n\n";
   message += "URI: ";
@@ -196,8 +195,16 @@ void textError404handler(){
   blinkLed(3, 200, 200);
 }
 
-void getData() {
+void error404handler() {
+  textError404handler();
+}
 
+
+void getData() {
+  logger.begin();
+  logger.print(F("Free heap:"));
+  logger.print(ESP.getFreeHeap(), DEC);
+  logger.end();
   /* Get a new sensor event */ 
   sensors_event_t event;
   bmp.getEvent(&event);
@@ -219,7 +226,7 @@ void getData() {
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t) || isnan(f)) {
     blinkLed(3, 200, 200);
-    Serial.println("Failed to read from DHT sensor!");
+    logger.println("Failed to read from DHT sensor!");
     return;
   }
 
@@ -241,7 +248,7 @@ void setup(void){
   Serial.begin(115200);
 
 //  Serial.begin(9600);
-  Serial.println("DHTxx test!");
+  logger.println("DHTxx test!");
 
   dht.begin();
 
@@ -260,14 +267,14 @@ void setup(void){
     delay(500);
     Serial.print(".");
   }
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  logger.println("");
+  logger.print("Connected to ");
+  logger.println(ssid);
+  logger.print("IP address: ");
+  logger.println(WiFi.localIP());
   
   if (mdns.begin("esp8266", WiFi.localIP())) {
-    Serial.println("MDNS responder started");
+    logger.println("MDNS responder started");
   }
   
   server.on("/", textSensorsHandler);
@@ -286,7 +293,7 @@ void setup(void){
   server.onNotFound(error404handler);
   
   server.begin();
-  Serial.println("HTTP server started");
+  logger.println("HTTP server started");
   blinkLed(10, 50, 100);
 }
  

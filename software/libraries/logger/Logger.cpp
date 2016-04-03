@@ -164,4 +164,91 @@ size_t  Logger::printfln(char *str, ...) {
   Serial.println("");
   return ++s;
 }
+size_t Logger::println(const char key[], const __FlashStringHelper *ifsh){
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(ifsh);
+}
+size_t Logger::println(const char key[], const String &str) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(str);
+}
+size_t Logger::println(const char key[], const char str[]) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(str);
+}
+size_t Logger::println(const char key[], char c) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(c);
+}
+size_t Logger::println(const char key[], unsigned char c, int b) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(c, b);
+}
+size_t Logger::println(const char key[], int i, int b) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(i, b);
+}
+size_t Logger::println(const char key[], unsigned int i, int b) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(i, b);
+}
+size_t Logger::println(const char key[], long l, int b) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(l, b);
+}
+size_t Logger::println(const char key[], unsigned long l, int b) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(l, b);
+}
+size_t Logger::println(const char key[], double d, int b) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(d, b);
+}
+size_t Logger::println(const char key[], const Printable& x) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  return Serial.println(x);
+}
+size_t  Logger::printfln(const char key[], char *str, ...) {
+  Serial.print(_header);
+  Serial.print(" ");
+  Serial.print(key);
+  Serial.print(" ");
+  size_t s = printf(str);
+  Serial.println("");
+  return ++s;
+}
+
 #undef ARDBUFFER

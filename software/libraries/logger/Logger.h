@@ -58,6 +58,23 @@
         return printfln((String) str, argv);
      }
 
+     size_t        println(const char key[], const __FlashStringHelper *);
+     size_t        println(const char key[], const String &);
+     size_t        println(const char key[], const char[]);
+     size_t        println(const char key[], char);
+     size_t        println(const char key[], unsigned char, int = DEC);
+     size_t        println(const char key[], int, int = DEC);
+     size_t        println(const char key[], unsigned int, int = DEC);
+     size_t        println(const char key[], long, int = DEC);
+     size_t        println(const char key[], unsigned long, int = DEC);
+     size_t        println(const char key[], double, int = 2);
+     size_t        println(const char key[], const Printable&);
+     size_t        printfln(const char key[], char *str, ...);
+     size_t        printfln(const char key[], String str, ...) {
+        va_list argv;
+        return print(key) + printfln((String) str, argv);
+     }
+
    private:
      const char* DEFAULT_HEADER              = "";
 

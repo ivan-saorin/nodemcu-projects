@@ -1,21 +1,15 @@
 #include <Logger.h>
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
-
-#include <WiFiClient.h>
-                                  
-//for LED status
-#include <Ticker.h>
-Ticker ticker;
-
+#include <WiFiClient.h>                                 
 #include <Wire.h>
-#include <Adafruit_TCS34725.h>
 #include <pins.h>
-
-#include "Zeroconf.h"
+#include <Zeroconf.h>
+#include <Ticker.h>
+#include <Adafruit_TCS34725.h>
 
 #include "rgbSensorTypes.h"
-
 #include "FS.h"
+
 
 #define DHTPIN D10     // what digital pin we're connected to
 
@@ -23,13 +17,14 @@ Ticker ticker;
 #define SDA_PIN D4  // sda pin
 #define SCL_PIN D5 // scl pin
 
+Ticker ticker;
+
 const char* server_version = "1.0.0";
 
 //Color Capture flags
 char capturedColorRGB[12];
 
-Zeroconf zeroConf("Wireless RGB Sensor", "Ivan Saorin", "ISCLS001", "1.0.5");
-// multicast DNS responder
+Zeroconf zeroConf("/config.json");
 
 /*
 INTEGRATIONTIME_2MS=0xFF   --<  2.4ms - 1 cycle    - Max Count: 1024  
@@ -66,7 +61,7 @@ int mv = MV_154MS;
 const int led = D0;
 const int sensor_led = D1;
 
-Logger logger("*rgbsesor.v2:");
+Logger logger("*rgbsesor.v3:");
 
 void tick()
 {
@@ -101,7 +96,6 @@ void handleRoot() {
   logger.println("Handle root!");
   ESP8266WebServer* server = zeroConf.getWebServer();
   // Just serve the index page from SPIFFS when asked for
-  //File index = SPIFFS.open("/index.html", "r");
   File index = SPIFFS.open("/index.html", "r");
   logger.begin();
   logger.print("File handler: ");
@@ -288,8 +282,12 @@ void setup() {
   server->onNotFound(error404handler);
   
   zeroConf.on("/", htmlSensorHandler);
-
+  
   zeroConf.on("/index.html", htmlSensorHandler);
+  zeroConf.advertise("$run", "/index.html");
+
+  //zeroConf.advertise("config", "/config.html");
+  
   zeroConf.on("/sensor.json", jsonSensorsHandler);
 
   zeroConf.on("/version", versionHandler);
